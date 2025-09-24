@@ -42,10 +42,14 @@ export default function Home() {
         title: titleInput.value,
         content: contentText.value,
       }),
-    }).then((data) => {
-      alert(data.msg);
-      router.replace(`/posts/${data.data.postDto.id}`);
-    });
+    })
+      .then((data) => {
+        alert(data.msg);
+        router.replace(`/posts/${data.data.postDto.id}`);
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   };
 
   return (
