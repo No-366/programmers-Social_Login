@@ -100,8 +100,65 @@ export default function Home() {
     });
   };
 
+  if (post === null) {
+    return <div>Loading...</div>;
+  }
+  return (
+    <>
+      <h1 className="p-2">글 상세 보기</h1>
+
+      <div>
+        <div>번호 : {post.id}</div>
+        <div>제목 : {post.title}</div>
+        <div>내용 : {post.content}</div>
+      </div>
+
+      <div className="flex gap-4">
+        <Link className="border-2 p-2 rounded" href={`/posts/${post.id}/edit`}>
+          수정
+        </Link>
+        <button
+          className="border-2 p-2 rounded"
+          onClick={() => {
+            deletePost(post.id);
+          }}
+        >
+          삭제
+        </button>
+      </div>
+
+      <PostCommentWriteAndList
+        post={post}
+        postComments={postComments}
+        setPostComments={setPostComments}
+      />
+    </>
+  );
+}
+
+function PostCommentWriteAndList({
+  post,
+  postComments,
+  setPostComments,
+}: {
+  post: PostDto;
+  postComments: PostCommentDto[] | null;
+  setPostComments: (postComments: PostCommentDto[]) => void;
+}) {
+  const onModifySuccess = (id: number, contentValue: string) => {
+    if (postComments === null) return;
+
+    setPostComments(
+      postComments.map((postComment) =>
+        postComment.id === id
+          ? { ...postComment, content: contentValue }
+          : postComment
+      )
+    );
+  };
+
   const deletePostComment = (commentId: number) => {
-    fetchApi(`/api/v1/posts/${postId}/comments/${commentId}`, {
+    fetchApi(`/api/v1/posts/${post.id}/comments/${commentId}`, {
       method: "DELETE",
     }).then((data) => {
       alert(data.msg);
@@ -132,7 +189,7 @@ export default function Home() {
       return;
     }
 
-    fetchApi(`/api/v1/posts/${postId}/comments`, {
+    fetchApi(`/api/v1/posts/${post.id}/comments`, {
       method: "POST",
       body: JSON.stringify({ content: contentValue }),
     }).then((data) => {
@@ -143,45 +200,8 @@ export default function Home() {
     });
   };
 
-  const onModifySuccess = (id: number, contentValue: string) => {
-    if (postComments === null) return;
-
-    setPostComments(
-      postComments.map((postComment) =>
-        postComment.id === id
-          ? { ...postComment, content: contentValue }
-          : postComment
-      )
-    );
-  };
-
-  if (post === null) {
-    return <div>Loading...</div>;
-  }
   return (
     <>
-      <h1 className="p-2">글 상세 보기</h1>
-
-      <div>
-        <div>번호 : {post.id}</div>
-        <div>제목 : {post.title}</div>
-        <div>내용 : {post.content}</div>
-      </div>
-
-      <div className="flex gap-4">
-        <Link className="border-2 p-2 rounded" href={`/posts/${post.id}/edit`}>
-          수정
-        </Link>
-        <button
-          className="border-2 p-2 rounded"
-          onClick={() => {
-            deletePost(post.id);
-          }}
-        >
-          삭제
-        </button>
-      </div>
-
       <h2 className="p-2">댓글 목록</h2>
       {postComments === null && <div>Loading...</div>}
 
