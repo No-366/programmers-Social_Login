@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/members/login", "/api/v1/members/join").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/members/logout").permitAll()
                         .requestMatchers("/api/*/adm/**").hasRole("ADMIN")
-                        .requestMatchers("/api/*/**").authenticated()
+                        .requestMatchers("/api/*/**").permitAll()
                         .anyRequest().authenticated())
                 .csrf((csrf) -> csrf.disable())
                 .headers((headers) -> headers

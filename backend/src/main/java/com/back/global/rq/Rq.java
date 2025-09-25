@@ -24,16 +24,21 @@ public class Rq {
 
     public Member getActor() {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        SecurityUser principal = (SecurityUser) authentication.getPrincipal();
+        return Optional.ofNullable(
+                        SecurityContextHolder
+                                .getContext().
+                                getAuthentication()
+                )
+                .map(Authentication::getPrincipal)
+                .filter(principal -> principal instanceof SecurityUser)
+                .map(principal -> (SecurityUser) principal)
+                .map(securityUser -> new Member(
+                        securityUser.getId(),
+                        securityUser.getUsername(),
+                        securityUser.getNickname()
+                ))
+                .orElse(new Member(4L, "user1", "유저1"));
 
-        long id = principal.getId();
-        String username = principal.getUsername();
-        String nickname = principal.getNickname();
-
-        Member member = new Member(id, username, nickname);
-
-        return member;
     }
 
     public void setHeader(String name, String value) {
