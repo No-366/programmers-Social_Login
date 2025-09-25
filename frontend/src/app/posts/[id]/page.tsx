@@ -58,7 +58,6 @@ function PostCommentListItem({
 }
 
 function PostCommentWrite({
-  postId,
   postCommentsState,
 }: {
   postId: number;
@@ -105,7 +104,6 @@ function PostCommentWrite({
 }
 
 function PostCommentList({
-  postId,
   postCommentsState,
 }: {
   postId: number;
@@ -172,12 +170,11 @@ function usePost(postId: number) {
       });
   }, []);
 
-  const deletePost = (id: number) => {
+  const deletePost = (id: number, onSuccess: (data: any) => void) => {
     fetchApi(`/api/v1/posts/${id}`, {
       method: "DELETE",
     }).then((data) => {
-      alert(data.msg);
-      router.replace("/posts");
+      onSuccess(data);
     });
   };
 
@@ -268,6 +265,7 @@ function PostInfo({
   postState: ReturnType<typeof usePost>;
 }) {
   const { deletePost } = postState;
+  const router = useRouter();
 
   return (
     <>
@@ -286,7 +284,10 @@ function PostInfo({
         <button
           className="border-2 p-2 rounded"
           onClick={() => {
-            deletePost(post.id);
+            deletePost(post.id, (data) => {
+              alert(data.msg);
+              router.replace("/posts");
+            });
           }}
         >
           삭제
