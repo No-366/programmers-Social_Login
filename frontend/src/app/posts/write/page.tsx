@@ -47,8 +47,8 @@ export default function Home() {
         alert(data.msg);
         router.replace(`/posts/${data.data.postDto.id}`);
       })
-      .catch((error) => {
-        alert(error.message);
+      .catch((rsData) => {
+        alert(rsData.msg);
       });
   };
 
