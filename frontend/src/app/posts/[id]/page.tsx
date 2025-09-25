@@ -219,14 +219,9 @@ function PostCommentWriteAndList({
   );
 }
 
-export default function Hoem() {
-  const { id: postId } = useParams();
-  const router = useRouter();
-
+function usePost(postId: number) {
   const [post, setPost] = useState<PostDto | null>(null);
-  const [postComments, setPostComments] = useState<PostCommentDto[] | null>(
-    null
-  );
+  const router = useRouter();
 
   useEffect(() => {
     fetchApi(`/api/v1/posts/${postId}`)
@@ -235,8 +230,6 @@ export default function Hoem() {
         alert(err);
         router.replace("/posts");
       });
-
-    fetchApi(`/api/v1/posts/${postId}/comments`).then(setPostComments);
   }, []);
 
   const deletePost = (id: number) => {
@@ -247,6 +240,20 @@ export default function Hoem() {
       router.replace("/posts");
     });
   };
+
+  return { post, deletePost };
+}
+
+export default function Home() {
+  const { id: postId } = useParams();
+  const { post, deletePost } = usePost(Number(postId));
+  const [postComments, setPostComments] = useState<PostCommentDto[] | null>(
+    null
+  );
+
+  useEffect(() => {
+    fetchApi(`/api/v1/posts/${postId}/comments`).then(setPostComments);
+  }, []);
 
   if (post === null) {
     return <div>Loading...</div>;
