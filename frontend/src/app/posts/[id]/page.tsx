@@ -8,20 +8,13 @@ import { useEffect, useState } from "react";
 
 function PostCommentListItem({
   postComment,
-  deletePostComment,
-  postId,
-  onModifySuccess,
+  postCommentState,
 }: {
   postComment: PostCommentDto;
-  deletePostComment: (commentId: number) => void;
-  postId: number;
-  onModifySuccess: (id: number, contentValue: string) => void;
+  postCommentState: ReturnType<typeof usePostComments>;
 }) {
-  const [modifyMode, setModifyMode] = useState(false);
-
-  const toggleModifyMode = () => {
-    setModifyMode(!modifyMode);
-  };
+  const { modifyPostComment, toggleModifyMode, modifyMode, deletePostComment } =
+    postCommentState;
 
   const handleModifySubmit = (e: any) => {
     e.preventDefault();
@@ -29,14 +22,7 @@ function PostCommentListItem({
     const contentInput = form.content;
     const contentValue = contentInput.value;
 
-    fetchApi(`/api/v1/posts/${postId}/comments/${postComment.id}`, {
-      method: "PUT",
-      body: JSON.stringify({ content: contentValue }),
-    }).then((data) => {
-      alert(data.msg);
-      toggleModifyMode();
-      onModifySuccess(postComment.id, contentValue);
-    });
+    modifyPostComment(postComment.id, contentValue);
   };
 
   return (
@@ -73,13 +59,13 @@ function PostCommentListItem({
 
 function PostCommentWrite({
   postId,
-  postComments,
-  setPostComments,
+  postCommentsState,
 }: {
   postId: number;
-  postComments: PostCommentDto[] | null;
-  setPostComments: (postComments: PostCommentDto[]) => void;
+  postCommentsState: ReturnType<typeof usePostComments>;
 }) {
+  const { writePostComment } = postCommentsState;
+
   const handleAddPostComment = (e: any) => {
     const form = e.target;
     const contentInput = form.content;
@@ -97,15 +83,7 @@ function PostCommentWrite({
       return;
     }
 
-    fetchApi(`/api/v1/posts/${postId}/comments`, {
-      method: "POST",
-      body: JSON.stringify({ content: contentValue }),
-    }).then((data) => {
-      alert(data.msg);
-
-      if (postComments === null) return;
-      setPostComments([...postComments, data.data.commentDto]);
-    });
+    writePostComment(contentValue);
   };
 
   return (
@@ -128,15 +106,14 @@ function PostCommentWrite({
 
 function PostCommentList({
   postId,
-  postComments,
-  deletePostComment,
-  onModifySuccess,
+  postCommentsState,
 }: {
   postId: number;
-  postComments: PostCommentDto[] | null;
-  deletePostComment: (commentId: number) => void;
-  onModifySuccess: (id: number, contentValue: string) => void;
+  postCommentsState: ReturnType<typeof usePostComments>;
 }) {
+  const { postComments, deletePostComment, onModifySuccess } =
+    postCommentsState;
+
   return (
     <>
       <h2 className="p-2">댓글 목록</h2>
@@ -153,9 +130,7 @@ function PostCommentList({
               <PostCommentListItem
                 key={postComment.id}
                 postComment={postComment}
-                deletePostComment={deletePostComment}
-                postId={postId}
-                onModifySuccess={onModifySuccess}
+                postCommentState={postCommentsState}
               />
             ))}
           </ul>
@@ -167,54 +142,19 @@ function PostCommentList({
 
 function PostCommentWriteAndList({
   post,
-  postComments,
-  setPostComments,
+  postCommentsState,
 }: {
   post: PostDto;
-  postComments: PostCommentDto[] | null;
-  setPostComments: (postComments: PostCommentDto[]) => void;
+  postCommentsState: ReturnType<typeof usePostComments>;
 }) {
-  const onModifySuccess = (id: number, contentValue: string) => {
-    if (postComments === null) return;
-
-    setPostComments(
-      postComments.map((postComment) =>
-        postComment.id === id
-          ? { ...postComment, content: contentValue }
-          : postComment
-      )
-    );
-  };
-
-  const deletePostComment = (commentId: number) => {
-    fetchApi(`/api/v1/posts/${post.id}/comments/${commentId}`, {
-      method: "DELETE",
-    }).then((data) => {
-      alert(data.msg);
-
-      if (postComments === null) return;
-
-      // 리렌더링을 위한 댓글 배열 교체 필요
-      setPostComments(
-        postComments.filter((postComment) => postComment.id !== commentId)
-      );
-    });
-  };
-
   return (
     <>
       <PostCommentWrite
         postId={post.id}
-        postComments={postComments}
-        setPostComments={setPostComments}
+        postCommentsState={postCommentsState}
       />
 
-      <PostCommentList
-        postId={post.id}
-        postComments={postComments}
-        deletePostComment={deletePostComment}
-        onModifySuccess={onModifySuccess}
-      />
+      <PostCommentList postId={post.id} postCommentsState={postCommentsState} />
     </>
   );
 }
@@ -244,16 +184,89 @@ function usePost(postId: number) {
   return { post, deletePost };
 }
 
-export default function Home() {
-  const { id: postId } = useParams();
-  const { post, deletePost } = usePost(Number(postId));
+function usePostComments(postId: number) {
   const [postComments, setPostComments] = useState<PostCommentDto[] | null>(
     null
   );
+  const [modifyMode, setModifyMode] = useState(false);
 
   useEffect(() => {
     fetchApi(`/api/v1/posts/${postId}/comments`).then(setPostComments);
   }, []);
+
+  const deletePostComment = (commentId: number) => {
+    fetchApi(`/api/v1/posts/${postId}/comments/${commentId}`, {
+      method: "DELETE",
+    }).then((data) => {
+      alert(data.msg);
+
+      if (postComments === null) return;
+
+      // 리렌더링을 위한 댓글 배열 교체 필요
+      setPostComments(
+        postComments.filter((postComment) => postComment.id !== commentId)
+      );
+    });
+  };
+
+  const writePostComment = (contentValue: string) => {
+    fetchApi(`/api/v1/posts/${postId}/comments`, {
+      method: "POST",
+      body: JSON.stringify({ content: contentValue }),
+    }).then((data) => {
+      alert(data.msg);
+
+      if (postComments === null) return;
+      setPostComments([...postComments, data.data.commentDto]);
+    });
+  };
+
+  const modifyPostComment = (commentId: number, contentValue: string) => {
+    fetchApi(`/api/v1/posts/${postId}/comments/${commentId}`, {
+      method: "PUT",
+      body: JSON.stringify({ content: contentValue }),
+    }).then((data) => {
+      alert(data.msg);
+      toggleModifyMode();
+      onModifySuccess(commentId, contentValue);
+    });
+  };
+
+  const toggleModifyMode = () => {
+    setModifyMode(!modifyMode);
+  };
+
+  const onModifySuccess = (id: number, contentValue: string) => {
+    if (postComments === null) return;
+
+    setPostComments(
+      postComments.map((postComment) =>
+        postComment.id === id
+          ? { ...postComment, content: contentValue }
+          : postComment
+      )
+    );
+  };
+
+  return {
+    postComments,
+    setPostComments,
+    deletePostComment,
+    onModifySuccess,
+    writePostComment,
+    modifyPostComment,
+    toggleModifyMode,
+    modifyMode,
+  };
+}
+
+export default function Home() {
+  const { id: postIdStr } = useParams();
+  const postId = Number(postIdStr);
+  const postState = usePost(postId);
+  const postCommentsState = usePostComments(postId);
+
+  const { post, deletePost } = postState;
 
   if (post === null) {
     return <div>Loading...</div>;
@@ -284,8 +297,7 @@ export default function Home() {
 
       <PostCommentWriteAndList
         post={post}
-        postComments={postComments}
-        setPostComments={setPostComments}
+        postCommentsState={postCommentsState}
       />
     </>
   );
