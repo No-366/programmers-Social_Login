@@ -23,7 +23,14 @@ function PostCommentListItem({
     const contentInput = form.content;
     const contentValue = contentInput.value;
 
-    modifyPostComment(postComment.id, contentValue);
+    modifyPostComment(postComment.id, contentValue, {
+      onSuccess: (data) => {
+        alert(data.msg);
+      },
+      onError: (err) => {
+        alert(err);
+      },
+    });
   };
 
   return (
@@ -49,7 +56,11 @@ function PostCommentListItem({
       <button
         className="border-2 p-2 rounded"
         onClick={() => {
-          deletePostComment(postComment.id);
+          deletePostComment(postComment.id, {
+            onError: (err) => {
+              alert(err);
+            },
+          });
         }}
       >
         삭제
@@ -83,7 +94,14 @@ function PostCommentWrite({
       return;
     }
 
-    writePostComment(contentValue);
+    writePostComment(contentValue, {
+      onError: (err) => {
+        alert(err);
+      },
+      onSuccess: (data) => {
+        alert(data.msg);
+      },
+    });
   };
 
   return (
@@ -110,8 +128,15 @@ function PostCommentList({
   postId: number;
   postCommentsState: ReturnType<typeof usePostComments>;
 }) {
-  const { postComments, deletePostComment, onModifySuccess } =
-    postCommentsState;
+  const { postComments, getPostComments } = postCommentsState;
+
+  useEffect(() => {
+    getPostComments({
+      onError: (err) => {
+        alert(err);
+      },
+    });
+  }, []);
 
   return (
     <>
@@ -194,69 +219,87 @@ function usePostComments(postId: number) {
   );
   const [modifyMode, setModifyMode] = useState(false);
 
-  useEffect(() => {
-    fetchApi(`/api/v1/posts/${postId}/comments`).then(setPostComments);
-  }, []);
-
-  const deletePostComment = (commentId: number) => {
-    fetchApi(`/api/v1/posts/${postId}/comments/${commentId}`, {
-      method: "DELETE",
-    }).then((data) => {
-      alert(data.msg);
-
-      if (postComments === null) return;
-
-      // 리렌더링을 위한 댓글 배열 교체 필요
-      setPostComments(
-        postComments.filter((postComment) => postComment.id !== commentId)
-      );
-    });
+  const getPostComments = (callbacks: FetchCallbacks) => {
+    fetchApi(`/api/v1/posts/${postId}/comments`)
+      .then(setPostComments)
+      .catch((rsData) => {
+        callbacks.onError?.(rsData.msg);
+      });
   };
 
-  const writePostComment = (contentValue: string) => {
+  const deletePostComment = (commentId: number, callbacks: FetchCallbacks) => {
+    fetchApi(`/api/v1/posts/${postId}/comments/${commentId}`, {
+      method: "DELETE",
+    })
+      .then((data) => {
+        if (postComments === null) return;
+        setPostComments(
+          postComments.filter((postComment) => postComment.id !== commentId)
+        );
+
+        callbacks.onSuccess?.(data);
+      })
+      .catch((rsData) => {
+        callbacks.onError?.(rsData.msg);
+      });
+  };
+
+  const writePostComment = (
+    contentValue: string,
+    callbacks: FetchCallbacks
+  ) => {
     fetchApi(`/api/v1/posts/${postId}/comments`, {
       method: "POST",
       body: JSON.stringify({ content: contentValue }),
-    }).then((data) => {
-      alert(data.msg);
+    })
+      .then((data) => {
+        if (postComments === null) return;
+        setPostComments([...postComments, data.data.commentDto]);
 
-      if (postComments === null) return;
-      setPostComments([...postComments, data.data.commentDto]);
-    });
+        callbacks.onSuccess?.(data);
+      })
+      .catch((rsData) => {
+        callbacks.onError?.(rsData.msg);
+      });
   };
 
-  const modifyPostComment = (commentId: number, contentValue: string) => {
+  const modifyPostComment = (
+    commentId: number,
+    contentValue: string,
+    callbacks: FetchCallbacks
+  ) => {
     fetchApi(`/api/v1/posts/${postId}/comments/${commentId}`, {
       method: "PUT",
       body: JSON.stringify({ content: contentValue }),
-    }).then((data) => {
-      alert(data.msg);
-      toggleModifyMode();
-      onModifySuccess(commentId, contentValue);
-    });
+    })
+      .then((data) => {
+        toggleModifyMode();
+        if (postComments === null) return;
+
+        setPostComments(
+          postComments.map((postComment) =>
+            postComment.id === commentId
+              ? { ...postComment, content: contentValue }
+              : postComment
+          )
+        );
+
+        callbacks.onSuccess?.(data);
+      })
+      .catch((rsData) => {
+        callbacks.onError?.(rsData.msg);
+      });
   };
 
   const toggleModifyMode = () => {
     setModifyMode(!modifyMode);
   };
 
-  const onModifySuccess = (id: number, contentValue: string) => {
-    if (postComments === null) return;
-
-    setPostComments(
-      postComments.map((postComment) =>
-        postComment.id === id
-          ? { ...postComment, content: contentValue }
-          : postComment
-      )
-    );
-  };
-
   return {
     postComments,
+    getPostComments,
     setPostComments,
     deletePostComment,
-    onModifySuccess,
     writePostComment,
     modifyPostComment,
     toggleModifyMode,
