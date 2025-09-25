@@ -4,6 +4,7 @@ import { fetchApi } from "@/lib/client";
 import { PostCommentDto, PostDto } from "@/type/post";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import router from "next/router";
 import { useEffect, useState } from "react";
 
 function PostCommentListItem({
@@ -157,28 +158,34 @@ function PostCommentWriteAndList({
   );
 }
 
+type FetchCallbacks = {
+  onSuccess?: (data: any) => void;
+  onError?: (err: any) => void;
+};
+
 function usePost(postId: number) {
   const [post, setPost] = useState<PostDto | null>(null);
-  const router = useRouter();
 
-  useEffect(() => {
+  const getPost = (callbacks: FetchCallbacks) => {
     fetchApi(`/api/v1/posts/${postId}`)
       .then(setPost)
       .catch((err) => {
-        alert(err);
-        router.replace("/posts");
+        callbacks.onError?.(err);
       });
-  }, []);
-
-  const deletePost = (id: number, onSuccess: (data: any) => void) => {
+  };
+  const deletePost = (id: number, callbacks: FetchCallbacks) => {
     fetchApi(`/api/v1/posts/${id}`, {
       method: "DELETE",
-    }).then((data) => {
-      onSuccess(data);
-    });
+    })
+      .then((data) => {
+        callbacks.onSuccess?.(data);
+      })
+      .catch((rsData) => {
+        callbacks.onError?.(rsData.msg);
+      });
   };
 
-  return { post, deletePost };
+  return { post, deletePost, getPost };
 }
 
 function usePostComments(postId: number) {
@@ -269,9 +276,14 @@ function PostInfo({
 
   const _deletePost = () => {
     confirm("정말 삭제하시겠습니까?") &&
-      deletePost(post.id, (data) => {
-        alert(data.msg);
-        router.replace("/posts");
+      deletePost(post.id, {
+        onSuccess: (data) => {
+          alert(data.msg);
+          router.replace("/posts");
+        },
+        onError: (err) => {
+          alert(err);
+        },
       });
   };
 
@@ -302,7 +314,16 @@ export default function Home() {
   const postId = Number(postIdStr);
   const postState = usePost(postId);
   const postCommentsState = usePostComments(postId);
-  const { post } = postState;
+  const { post, getPost } = postState;
+
+  useEffect(() => {
+    getPost({
+      onSuccess: (err) => {
+        alert(err);
+        router.replace("/posts");
+      },
+    });
+  }, []);
 
   if (post === null) {
     return <div>Loading...</div>;

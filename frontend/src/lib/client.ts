@@ -9,7 +9,7 @@ export function fetchApi(url: string, options?: RequestInit) {
     async (res) => {
       if (!res.ok) {
         const rsData = await res.json();
-        throw new Error(rsData.msg || "요청 실패");
+        throw rsData;
       }
       return res.json();
     }
