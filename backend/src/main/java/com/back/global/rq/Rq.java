@@ -2,6 +2,7 @@ package com.back.global.rq;
 
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
+import com.back.global.exception.ServiceException;
 import com.back.global.security.SecurityUser;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ public class Rq {
                         securityUser.getUsername(),
                         securityUser.getNickname()
                 ))
-                .orElse(new Member(4L, "user1", "유저1"));
+                .orElseThrow(() -> new ServiceException("401-1", "로그인 후 이용해주세요."));
 
     }
 
