@@ -267,6 +267,14 @@ function PostInfo({
   const { deletePost } = postState;
   const router = useRouter();
 
+  const _deletePost = () => {
+    confirm("정말 삭제하시겠습니까?") &&
+      deletePost(post.id, (data) => {
+        alert(data.msg);
+        router.replace("/posts");
+      });
+  };
+
   return (
     <>
       <h1 className="p-2">글 상세 보기</h1>
@@ -281,15 +289,7 @@ function PostInfo({
         <Link className="border-2 p-2 rounded" href={`/posts/${post.id}/edit`}>
           수정
         </Link>
-        <button
-          className="border-2 p-2 rounded"
-          onClick={() => {
-            deletePost(post.id, (data) => {
-              alert(data.msg);
-              router.replace("/posts");
-            });
-          }}
-        >
+        <button className="border-2 p-2 rounded" onClick={_deletePost}>
           삭제
         </button>
       </div>
