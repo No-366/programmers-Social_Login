@@ -260,17 +260,15 @@ function usePostComments(postId: number) {
   };
 }
 
-export default function Home() {
-  const { id: postIdStr } = useParams();
-  const postId = Number(postIdStr);
-  const postState = usePost(postId);
-  const postCommentsState = usePostComments(postId);
+function PostInfo({
+  post,
+  postState,
+}: {
+  post: PostDto;
+  postState: ReturnType<typeof usePost>;
+}) {
+  const { deletePost } = postState;
 
-  const { post, deletePost } = postState;
-
-  if (post === null) {
-    return <div>Loading...</div>;
-  }
   return (
     <>
       <h1 className="p-2">글 상세 보기</h1>
@@ -294,7 +292,24 @@ export default function Home() {
           삭제
         </button>
       </div>
+    </>
+  );
+}
 
+export default function Home() {
+  const { id: postIdStr } = useParams();
+  const postId = Number(postIdStr);
+  const postState = usePost(postId);
+  const postCommentsState = usePostComments(postId);
+  const { post } = postState;
+
+  if (post === null) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <>
+      <PostInfo post={post} postState={postState} />
       <PostCommentWriteAndList
         post={post}
         postCommentsState={postCommentsState}
