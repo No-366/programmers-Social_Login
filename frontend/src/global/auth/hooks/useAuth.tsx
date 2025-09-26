@@ -26,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const [loginMember, setLoginMember] = useState<MemberDto | null>(null);
   const isLogin = loginMember !== null;
+  const isAdmin = isLogin && loginMember.isAdmin;
 
   const getLoginMember = (callbacks: FetchCallbacks) => {
     fetchApi("/api/v1/members/me")
@@ -51,5 +52,12 @@ export function useAuth() {
         });
   };
 
-  return { loginMember, getLoginMember, logout, isLogin, setLoginMember };
+  return {
+    loginMember,
+    getLoginMember,
+    logout,
+    isLogin,
+    setLoginMember,
+    isAdmin,
+  };
 }

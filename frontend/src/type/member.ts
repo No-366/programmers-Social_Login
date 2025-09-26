@@ -3,6 +3,7 @@ export type MemberDto = {
   name: string;
   createDate: string;
   modifyDate: string;
+  isAdmin: boolean;
 };
 
 export type MemberWithUsernameDto = MemberDto & {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuthContext } from "@/global/auth/hooks/useAuth";
 import { fetchApi } from "@/lib/client";
 import { MemberWithUsernameDto } from "@/type/member";
 import Link from "next/link";
@@ -7,14 +8,23 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const [members, setMembers] = useState<MemberWithUsernameDto[] | null>(null);
+  const { isAdmin } = useAuthContext();
 
   useEffect(() => {
+    if (!isAdmin) {
+      return;
+    }
+
     fetchApi(`/api/v1/adm/members`)
       .then(setMembers)
       .catch((rsData) => {
         alert(rsData.msg);
       });
   }, []);
+
+  if (!isAdmin) {
+    return <div>관리자 권한이 없습니다.</div>;
+  }
 
   return (
     <>
