@@ -7,6 +7,14 @@ export const AuthContext = createContext<ReturnType<typeof useAuth> | null>(
   null
 );
 
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const authState = useAuth();
+
+  return (
+    <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>
+  );
+}
+
 export function useAuth() {
   const [loginMember, setLoginMember] = useState<MemberDto | null>(null);
   const getLoginMember = (callbacks: FetchCallbacks) => {

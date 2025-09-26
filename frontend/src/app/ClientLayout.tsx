@@ -1,5 +1,5 @@
 "use client";
-import { useAuth, AuthContext } from "@/global/auth/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/global/auth/hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -39,7 +39,7 @@ export default function ClientLayout({
 
   return (
     <>
-      <AuthContext.Provider value={authState}>
+      <AuthProvider>
         <header>
           <nav className="flex gap-4">
             <Link href="/">메인</Link>
@@ -53,7 +53,7 @@ export default function ClientLayout({
           {children}
         </main>
         <footer>푸터</footer>
-      </AuthContext.Provider>
+      </AuthProvider>
     </>
   );
 }
