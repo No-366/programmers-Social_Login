@@ -44,7 +44,7 @@ export default function ClientLayout({
           <Link href="/posts">글 목록</Link>
           {!isLogin && <Link href="/members/login">로그인</Link>}
           {isLogin && <button onClick={logout}>로그아웃</button>}
-          {isLogin && <Link href="#">{loginMember?.name}</Link>}
+          {isLogin && <Link href="/members/me">{loginMember?.name}</Link>}
         </nav>
       </header>
       <main className="flex-1 flex flex-col justify-center items-center">
