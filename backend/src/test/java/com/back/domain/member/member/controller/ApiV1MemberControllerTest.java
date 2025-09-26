@@ -69,7 +69,8 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.data.memberDto.id").value(6))
                 .andExpect(jsonPath("$.data.memberDto.createDate").exists())
                 .andExpect(jsonPath("$.data.memberDto.modifyDate").exists())
-                .andExpect(jsonPath("$.data.memberDto.name").value(nickname));
+                .andExpect(jsonPath("$.data.memberDto.name").value(nickname))
+                .andExpect(jsonPath("$.data.memberDto.isAdmin").value(false));
     }
 
 
@@ -138,7 +139,8 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.data.memberDto.id").value(member.getId()))
                 .andExpect(jsonPath("$.data.memberDto.createDate").value(Matchers.startsWith(member.getCreateDate().toString().substring(0, 20))))
                 .andExpect(jsonPath("$.data.memberDto.modifyDate").value(Matchers.startsWith(member.getModifyDate().toString().substring(0, 20))))
-                .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()));
+                .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()))
+                .andExpect(jsonPath("$.data.memberDto.isAdmin").value(member.isAdmin()));
 
         resultActions.andExpect(
                 result -> {
@@ -215,7 +217,8 @@ public class ApiV1MemberControllerTest {
                 .andExpect(jsonPath("$.data.memberDto.id").value(member.getId()))
                 .andExpect(jsonPath("$.data.memberDto.createDate").value(Matchers.startsWith(member.getCreateDate().toString().substring(0, 20))))
                 .andExpect(jsonPath("$.data.memberDto.modifyDate").value(Matchers.startsWith(member.getCreateDate().toString().substring(0, 20))))
-                .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()));
+                .andExpect(jsonPath("$.data.memberDto.name").value(member.getName()))
+                .andExpect(jsonPath("$.data.memberDto.isAdmin").value(member.isAdmin()));
     }
 
     @Test

@@ -9,7 +9,8 @@ public record MemberWithUsernameDto(
         LocalDateTime createDate,
         LocalDateTime modifyDate,
         String username,
-        String nickname
+        String nickname,
+        boolean isAdmin
 
 ) {
     public MemberWithUsernameDto(Member member) {
@@ -18,7 +19,8 @@ public record MemberWithUsernameDto(
                 member.getCreateDate(),
                 member.getModifyDate(),
                 member.getUsername(),
-                member.getNickname()
+                member.getNickname(),
+                member.isAdmin()
         );
     }
 }

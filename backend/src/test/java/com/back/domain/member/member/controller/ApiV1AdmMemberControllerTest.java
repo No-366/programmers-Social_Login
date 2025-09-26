@@ -1,6 +1,5 @@
 package com.back.domain.member.member.controller;
 
-import com.back.domain.member.member.controller.ApiV1AdmMemberController;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.repository.MemberRepository;
 import jakarta.servlet.http.Cookie;
@@ -56,7 +55,8 @@ public class ApiV1AdmMemberControllerTest {
                 .andExpect(jsonPath("$[0].createDate").exists())
                 .andExpect(jsonPath("$[0].modifyDate").exists())
                 .andExpect(jsonPath("$[0].nickname").value("시스템"))
-                .andExpect(jsonPath("$[0].username").value("system"));
+                .andExpect(jsonPath("$[0].username").value("system"))
+                .andExpect(jsonPath("$[0].isAdmin").value("false"));
     }
 
     @Test
