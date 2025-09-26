@@ -1,9 +1,11 @@
 "use client";
 
+import { useAuthContext } from "@/global/auth/hooks/useAuth";
 import { fetchApi } from "@/lib/client";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { setLoginMember } = useAuthContext();
   const router = useRouter();
 
   const handleSubmit = (e: any) => {
@@ -32,6 +34,7 @@ export default function Home() {
       }),
     })
       .then((data) => {
+        setLoginMember(data.data.memberDto);
         alert(data.msg);
         router.replace("/");
       })

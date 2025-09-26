@@ -20,13 +20,13 @@ export function useAuthContext() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const authState = useAuth();
 
-  return (
-    <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>
-  );
+  return <AuthContext value={authState}>{children}</AuthContext>;
 }
 
 export function useAuth() {
   const [loginMember, setLoginMember] = useState<MemberDto | null>(null);
+  const isLogin = loginMember !== null;
+
   const getLoginMember = (callbacks: FetchCallbacks) => {
     fetchApi("/api/v1/members/me")
       .then((data) => {
@@ -51,5 +51,5 @@ export function useAuth() {
         });
   };
 
-  return { loginMember, getLoginMember, logout };
+  return { loginMember, getLoginMember, logout, isLogin, setLoginMember };
 }
