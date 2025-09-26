@@ -1,10 +1,12 @@
 "use client";
 
+import { useAuthContext } from "@/global/auth/hooks/useAuth";
 import { fetchApi } from "@/lib/client";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
   const router = useRouter();
+  const { isLogin } = useAuthContext();
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -51,6 +53,10 @@ export default function Home() {
         alert(rsData.msg);
       });
   };
+
+  if (!isLogin) {
+    return <div>로그인 후 이용해주세요.</div>;
+  }
 
   return (
     <>
