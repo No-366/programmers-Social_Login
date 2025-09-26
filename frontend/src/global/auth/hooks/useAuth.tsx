@@ -1,11 +1,21 @@
 import { fetchApi } from "@/lib/client";
 import { FetchCallbacks } from "@/type/client";
 import { MemberDto } from "@/type/member";
-import { createContext, useState } from "react";
+import { createContext, use, useState } from "react";
 
 export const AuthContext = createContext<ReturnType<typeof useAuth> | null>(
   null
 );
+
+export function useAuthContext() {
+  const authState = use(AuthContext);
+
+  if (authState === null) {
+    throw new Error("AuthContext is not found");
+  }
+
+  return authState;
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const authState = useAuth();

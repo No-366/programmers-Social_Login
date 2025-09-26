@@ -1,21 +1,16 @@
 "use client";
-import { AuthContext, AuthProvider } from "@/global/auth/hooks/useAuth";
+import { AuthProvider, useAuthContext } from "@/global/auth/hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 
 export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const authState = use(AuthContext);
-
-  const {
-    loginMember = null,
-    getLoginMember = () => {},
-    logout: _logout = () => {},
-  } = authState || {};
+  const authState = useAuthContext();
+  const { loginMember, getLoginMember, logout: _logout } = authState;
   const isLogin = loginMember !== null;
   const router = useRouter();
 
