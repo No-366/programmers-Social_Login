@@ -4,3 +4,7 @@ export type MemberDto = {
   createDate: string;
   modifyDate: string;
 };
+
+export type MemberWithUsernameDto = MemberDto & {
+  username: string;
+};
