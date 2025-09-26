@@ -1,6 +1,7 @@
 "use client";
 
 import { fetchApi } from "@/lib/client";
+import { FetchCallbacks } from "@/type/client";
 import { PostCommentDto, PostDto } from "@/type/post";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -182,11 +183,6 @@ function PostCommentWriteAndList({
     </>
   );
 }
-
-type FetchCallbacks = {
-  onSuccess?: (data: any) => void;
-  onError?: (err: any) => void;
-};
 
 function usePost(postId: number) {
   const [post, setPost] = useState<PostDto | null>(null);
