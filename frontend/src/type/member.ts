@@ -8,4 +8,5 @@ export type MemberDto = {
 
 export type MemberWithUsernameDto = MemberDto & {
   username: string;
+  nickname: string;
 };

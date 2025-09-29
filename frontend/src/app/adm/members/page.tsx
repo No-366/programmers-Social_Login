@@ -39,7 +39,7 @@ export default function Home() {
             {members.map((member) => (
               <li key={member.id}>
                 <Link href={`/posts/${member.id}`}>
-                  {member.id} : {member.username} : {member.name}
+                  {member.id} : {member.username} / {member.nickname}
                 </Link>
               </li>
             ))}
