@@ -1,14 +1,13 @@
 "use client";
 
-import { useAuthContext } from "@/global/auth/hooks/useAuth";
+import WithLogin from "@/global/auth/hoc/withLogin";
+import { MemberDto } from "@/type/member";
 
-export default function Home() {
-  const { loginMember } = useAuthContext();
-
-  if (loginMember === null) {
-    return <div>로그인 후 이용해주세요.</div>;
-  }
-
+export default WithLogin(function Home({
+  loginMember,
+}: {
+  loginMember: MemberDto;
+}) {
   return (
     <>
       <h1>회원 정보</h1>
@@ -20,4 +19,4 @@ export default function Home() {
       </div>
     </>
   );
-}
+});

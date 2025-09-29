@@ -1,12 +1,13 @@
 "use client";
 
+import WithLogin from "@/global/auth/hoc/withLogin";
 import { useAuthContext } from "@/global/auth/hooks/useAuth";
 import { fetchApi } from "@/lib/client";
 import { PostDto } from "@/type/post";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Home() {
+export default WithLogin(function Home() {
   const { id } = useParams();
   const router = useRouter();
   const [post, setPost] = useState<PostDto | null>(null);
@@ -49,11 +50,6 @@ export default function Home() {
         alert(rsData.msg);
       });
   };
-
-  if (!isLogin) {
-    return <div>로그인 후 이용해주세요.</div>;
-  }
-
   if (post === null) {
     return <div>Loading...</div>;
   }
@@ -81,4 +77,4 @@ export default function Home() {
       </form>
     </>
   );
-}
+});
