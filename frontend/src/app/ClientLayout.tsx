@@ -10,7 +10,13 @@ export default function ClientLayout({
   children: React.ReactNode;
 }) {
   const authState = useAuthContext();
-  const { loginMember, getLoginMember, logout: _logout, isLogin } = authState;
+  const {
+    loginMember,
+    getLoginMember,
+    logout: _logout,
+    isLogin,
+    isAdmin,
+  } = authState;
   const router = useRouter();
 
   useEffect(() => {
@@ -45,6 +51,7 @@ export default function ClientLayout({
           {!isLogin && <Link href="/members/login">로그인</Link>}
           {isLogin && <button onClick={logout}>로그아웃</button>}
           {isLogin && <Link href="/members/me">{loginMember?.name}</Link>}
+          {isLogin && isAdmin && <Link href="/adm/members">회원 목록</Link>}
         </nav>
       </header>
       <main className="flex-1 flex flex-col justify-center items-center">
