@@ -1,3 +1,4 @@
+"use client";
 import { useAuthContext } from "@/global/auth/hooks/useAuth";
 import { MemberDto } from "@/type/member";
 

@@ -1,11 +1,12 @@
 "use client";
 
+import WithLogout from "@/global/auth/hoc/withLogout";
 import { useAuthContext } from "@/global/auth/hooks/useAuth";
 import { fetchApi } from "@/lib/client";
 import { useRouter } from "next/navigation";
 
-export default function Home() {
-  const { setLoginMember, isLogin } = useAuthContext();
+export default WithLogout(function Home() {
+  const { setLoginMember } = useAuthContext();
   const router = useRouter();
 
   const handleSubmit = (e: any) => {
@@ -43,10 +44,6 @@ export default function Home() {
       });
   };
 
-  if (isLogin) {
-    return <div>이미 로그인 되어있습니다.</div>;
-  }
-
   return (
     <>
       <h1 className="text-center">로그인</h1>
@@ -71,4 +68,4 @@ export default function Home() {
       </form>
     </>
   );
-}
+});

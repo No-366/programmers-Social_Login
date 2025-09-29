@@ -1,14 +1,13 @@
 "use client";
 
-import { useAuthContext } from "@/global/auth/hooks/useAuth";
+import WithAdmin from "@/global/auth/hoc/withAdmin";
 import { fetchApi } from "@/lib/client";
 import { MemberWithUsernameDto } from "@/type/member";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function Home() {
+export default WithAdmin(function Home({ isAdmin }: { isAdmin: boolean }) {
   const [members, setMembers] = useState<MemberWithUsernameDto[] | null>(null);
-  const { isAdmin } = useAuthContext();
 
   useEffect(() => {
     if (!isAdmin) {
@@ -22,17 +21,13 @@ export default function Home() {
       });
   }, []);
 
-  if (!isAdmin) {
-    return <div>관리자 권한이 없습니다.</div>;
-  }
-
   return (
     <>
       <div className="flex flex-col gap-9">
         <h1>회원 목록</h1>
         {members === null && <div>Loading...</div>}
         {members !== null && members.length === 0 && (
-          <div>회원원이 없습니다.</div>
+          <div>회원이 없습니다.</div>
         )}
         {members !== null && members.length > 0 && (
           <ul>
@@ -48,4 +43,4 @@ export default function Home() {
       </div>
     </>
   );
-}
+});
