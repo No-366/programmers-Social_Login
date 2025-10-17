@@ -1,4 +1,9 @@
+server:
+  forward-headers-strategy: native #
+
 spring:
+  config:
+    import: optional:file:.env.properties
   profiles:
     active: dev
   thymeleaf:
@@ -23,6 +28,30 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  security:                           # Spring Security 관련 설정 블록
+    oauth2:                           # OAuth2 인증 관련 설정
+      client:                         # OAuth2 클라이언트(=우리 서비스)가 사용하는 정보
+        registration:                 # 각 소셜 로그인 제공자(카카오, 구글 등)에 대한 등록 정보
+          kakao:                      # Kakao OAuth2 클라이언트 설정 이름 (custom provider)
+            clientId: ${KAKAO_CLIENT_ID}       # 카카오 개발자 콘솔에서 발급받은 REST API 키 (환경변수 등으로 관리)
+            scope: profile_nickname, profile_image  # 카카오 API에서 요청할 사용자 정보 범위(권한)
+            client-name: Kakao        # 클라이언트 이름 (임의 지정 가능, 내부 식별용)
+            authorization-grant-type: authorization_code  # 인증 방식: Authorization Code Flow 사용
+            redirect-uri: '{baseUrl}/login/oauth2/code/kakao'
+              # 로그인 성공 후 카카오가 리디렉션할 콜백 URL
+            # Spring Security가 자동으로 이 경로를 매핑해 처리함
+
+        provider:                     # 각 소셜 로그인 서비스 제공자(provider)에 대한 엔드포인트 정의
+          kakao:                      # provider 이름 (위의 registration.kakao와 연결됨)
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            # 사용자를 카카오 로그인 페이지로 리디렉션할 인증 요청 URL
+            token-uri: https://kauth.kakao.com/oauth/token
+            # 인증 후 발급받을 Access Token을 요청하는 URL
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            # Access Token을 사용해 사용자 정보를 가져오는 API URL
+            user-name-attribute: id     # 사용자 정보 응답 JSON에서 고유 ID로 사용할 필드명 (카카오는 "id")
+
+
 
 springdoc:
   default-produces-media-type: application/json
@@ -37,4 +66,5 @@ logging:
 custom:
   jwt:
     expireSeconds: "#{30 * 60}"
-    secretPattern: abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
+    secretPattern: ${CUSTOM_JWT_SECRET_PATTERN}
+
