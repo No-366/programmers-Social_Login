@@ -34,6 +34,8 @@ public class CustomOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
 
 
         //로그인 성공시 프론트 페이지 복귀
-        response.sendRedirect("http://localhost:3000");//프론트 페이지
+        //response.sendRedirect("http://localhost:3000");//프론트 페이지
+        //rq를 이용
+        rq.sendRedirect("http://localhost:3000");
     }
 }
