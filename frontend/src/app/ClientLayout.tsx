@@ -49,6 +49,11 @@ export default function ClientLayout({
           <Link href="/">메인</Link>
           <Link href="/posts">글 목록</Link>
           {!isLogin && <Link href="/members/login">로그인</Link>}
+          {!isLogin && (
+            <Link href="http://localhost:8080/oauth2/authorization/kakao">
+              카카오 로그인
+            </Link>
+          )}
           {isLogin && <button onClick={logout}>로그아웃</button>}
           {isLogin && <Link href="/members/me">{loginMember?.name}</Link>}
           {isLogin && isAdmin && <Link href="/adm/members">회원 목록</Link>}
