@@ -46,7 +46,8 @@ spring:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
             # 사용자를 카카오 로그인 페이지로 리디렉션할 인증 요청 URL
             token-uri: https://kauth.kakao.com/oauth/token
-            # 인증 후 발급받을 Access Token을 요청하는 URL
+            # 인증 후 발급받을 Access Token을 요청하는 URL // 코드상에 직접 저장되지는 않고,
+            # Spring Security의 내부 세션(OAuth2AuthorizedClientService)에 자동으로 저장된다.
             user-info-uri: https://kapi.kakao.com/v2/user/me
             # Access Token을 사용해 사용자 정보를 가져오는 API URL
             user-name-attribute: id     # 사용자 정보 응답 JSON에서 고유 ID로 사용할 필드명 (카카오는 "id")

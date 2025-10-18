@@ -34,6 +34,30 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    public Member join(String username, String password, String nickname, String profileImgUrl) {
+
+        memberRepository.findByUsername(username)
+                .ifPresent(m -> {
+                    throw new ServiceException("409-1", "이미 사용중인 아이디입니다.");
+                });
+
+        Member member = new Member(username, passwordEncoder.encode(password), nickname, profileImgUrl);
+        return memberRepository.save(member);
+    }
+
+    //카카오에서 수정되었거나 아직 우리서비스에 회원가입이 되어있지 않은 경우 처리
+    public Member modifyOrJoin(String username, String password, String nickname, String profileImgUrl) {
+        Member member = memberRepository.findByUsername(username).orElse(null);
+
+        if(member == null){
+            return join(username, password, nickname, profileImgUrl);
+        }
+
+        member.update(nickname, profileImgUrl);
+
+        return member;
+    }
+
     public Optional<Member> findByUsername(String username) {
         return memberRepository.findByUsername(username);
     }
@@ -63,4 +87,6 @@ public class MemberService {
             throw new ServiceException("401-2", "비밀번호가 일치하지 않습니다.");
         }
     }
+
+
 }
